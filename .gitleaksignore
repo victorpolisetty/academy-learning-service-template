@@ -31,3 +31,10 @@ ec1643c0388c6e27fadcb4a4e4a6d3ad7de77163:packages/valory/services/learning_servi
 ec1643c0388c6e27fadcb4a4e4a6d3ad7de77163:packages/valory/services/learning_service/service.yaml:generic-api-key:199
 ec1643c0388c6e27fadcb4a4e4a6d3ad7de77163:packages/valory/skills/learning_abci/skill.yaml:generic-api-key:77
 ec1643c0388c6e27fadcb4a4e4a6d3ad7de77163:packages/valory/skills/learning_chained_abci/skill.yaml:generic-api-key:77
+c7afdfc0025157acbdc0f6f77e65d940ffba003a:packages/valory/agents/learning_agent/aea-config.yaml:generic-api-key:128
+c7afdfc0025157acbdc0f6f77e65d940ffba003a:packages/valory/services/learning_service/service.yaml:generic-api-key:61
+c7afdfc0025157acbdc0f6f77e65d940ffba003a:packages/valory/services/learning_service/service.yaml:generic-api-key:107
+c7afdfc0025157acbdc0f6f77e65d940ffba003a:packages/valory/services/learning_service/service.yaml:generic-api-key:153
+c7afdfc0025157acbdc0f6f77e65d940ffba003a:packages/valory/services/learning_service/service.yaml:generic-api-key:199
+c7afdfc0025157acbdc0f6f77e65d940ffba003a:packages/valory/skills/learning_abci/skill.yaml:generic-api-key:73
+c7afdfc0025157acbdc0f6f77e65d940ffba003a:packages/valory/skills/learning_chained_abci/skill.yaml:generic-api-key:77
