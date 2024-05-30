@@ -121,7 +121,9 @@ class TxPreparationBehaviour(
 
         with self.context.benchmark_tool.measure(self.behaviour_id).local():
             sender = self.context.agent_address
-            payload = TxPreparationPayload(sender=sender, tx_hash=None)
+            payload = TxPreparationPayload(
+                sender=sender, tx_submitter=None, tx_hash=None
+            )
 
         with self.context.benchmark_tool.measure(self.behaviour_id).consensus():
             yield from self.send_a2a_transaction(payload)
