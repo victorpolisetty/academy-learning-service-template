@@ -4,7 +4,7 @@ REPO_PATH=$PWD
 
 # Remove previous service build
 if test -d learning_service; then
-  echo "Removing previous service build"
+  echo "Removing previous service build (needs sudo permission)"
   sudo rm -r learning_service
 fi
 

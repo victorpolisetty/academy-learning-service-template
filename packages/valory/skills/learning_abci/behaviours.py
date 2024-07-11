@@ -36,6 +36,7 @@ from packages.valory.skills.learning_abci.payloads import (
 from packages.valory.skills.learning_abci.rounds import (
     APICheckRound,
     DecisionMakingRound,
+    Event,
     LearningAbciApp,
     SynchronizedData,
     TxPreparationRound,
@@ -79,13 +80,22 @@ class APICheckBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ance
 
         with self.context.benchmark_tool.measure(self.behaviour_id).local():
             sender = self.context.agent_address
-            payload = APICheckPayload(sender=sender, price=1.0)
+            price = yield from self.get_price()
+            payload = APICheckPayload(sender=sender, price=price)
 
         with self.context.benchmark_tool.measure(self.behaviour_id).consensus():
             yield from self.send_a2a_transaction(payload)
             yield from self.wait_until_round_end()
 
         self.set_done()
+
+    def get_price(self):
+        """Get token price from Coingecko"""
+        # result = yield from self.get_http_response("coingecko.com")
+        yield
+        price = 1.0
+        self.context.logger.info(f"Price is {price}")
+        return price
 
 
 class DecisionMakingBehaviour(
@@ -100,13 +110,21 @@ class DecisionMakingBehaviour(
 
         with self.context.benchmark_tool.measure(self.behaviour_id).local():
             sender = self.context.agent_address
-            payload = DecisionMakingPayload(sender=sender, event="done")
+            event = self.get_event()
+            payload = DecisionMakingPayload(sender=sender, event=event)
 
         with self.context.benchmark_tool.measure(self.behaviour_id).consensus():
             yield from self.send_a2a_transaction(payload)
             yield from self.wait_until_round_end()
 
         self.set_done()
+
+    def get_event(self):
+        """Get the next event"""
+        # Using the token price from the previous round, decide whether we should make a transfer or not
+        event = Event.DONE.value
+        self.context.logger.info(f"Event is {event}")
+        return event
 
 
 class TxPreparationBehaviour(
@@ -121,8 +139,9 @@ class TxPreparationBehaviour(
 
         with self.context.benchmark_tool.measure(self.behaviour_id).local():
             sender = self.context.agent_address
+            tx_hash = yield from self.get_tx_hash()
             payload = TxPreparationPayload(
-                sender=sender, tx_submitter=None, tx_hash=None
+                sender=sender, tx_submitter=None, tx_hash=tx_hash
             )
 
         with self.context.benchmark_tool.measure(self.behaviour_id).consensus():
@@ -130,6 +149,14 @@ class TxPreparationBehaviour(
             yield from self.wait_until_round_end()
 
         self.set_done()
+
+    def get_tx_hash(self):
+        """Get the tx hash"""
+        # We need to prepare a 1 wei transfer from the safe to another (configurable) account.
+        yield
+        tx_hash = None
+        self.context.logger.info(f"Transaction hash is {tx_hash}")
+        return tx_hash
 
 
 class LearningRoundBehaviour(AbstractRoundBehaviour):

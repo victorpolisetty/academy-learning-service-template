@@ -41,41 +41,52 @@ A service to learn about [Olas](https://olas.network/) agents and [Open Autonomy
 
 ### Prepare the data
 
-1. Prepare a keys.json file containing wallet address and the private key for each of the four agents.
+1. Prepare a `keys.json` file containing wallet address and the private key for each of the four agents.
 
     ```
     autonomy generate-key ethereum -n 4
     ```
 
-2. Deploy a [Safe on Gnosis](https://app.safe.global/welcome) (it's free) and set your agent addresses as signers. Set the signature threshold to 3 out of 4.
+2. Prepare a `ethereum_private_key.txt` file containing one of the private keys from `keys.json`. Ensure that there is no newline at the end.
 
-3. Fund your agents and Safe with a small amount of xDAI, i.e. $0.02 each.
+3. Deploy a [Safe on Gnosis](https://app.safe.global/welcome) (it's free) and set your agent addresses as signers. Set the signature threshold to 3 out of 4.
 
+4. Fund your agents and Safe with a small amount of xDAI, i.e. $0.02 each.
 
-### Run the service
-
-1. Make a copy of the env file:
+5. Make a copy of the env file:
 
     ```
     cp sample.env .env
     ```
 
-2. Fill in the required environment variables in .env. These variables are: `ALL_PARTICIPANTS`, `GNOSIS_LEDGER_RPC`, `COINGECKO_API_KEY` and `SAFE_CONTRACT_ADDRESS`. You will need to get a [Coingecko](https://www.coingecko.com/) free API and a [Tenderly](https://tenderly.co/) fork RPC (or alternatively an actual mainnet RPC if you want to run against the real chain).
+6. Fill in the required environment variables in .env. These variables are: `ALL_PARTICIPANTS`, `GNOSIS_LEDGER_RPC`, `COINGECKO_API_KEY` and `SAFE_CONTRACT_ADDRESS`. You will need to get a [Coingecko](https://www.coingecko.com/) free API and a [Tenderly](https://tenderly.co/) fork RPC (or alternatively an actual mainnet RPC if you want to run against the real chain).
 
-3. Check that Docker is running:
+
+### Run the service
+
+1. Check that Docker is running:
 
     ```
     docker
     ```
 
-4. Run the service:
+2. Run the service:
 
     ```
     bash run_service.sh
     ```
 
-5. Look at the service logs (on another terminal):
+3. Look at the service logs (on another terminal):
 
     ```
     docker logs -f learningservice_abci_0
+    ```
+
+
+### Run a single agent
+
+1. Run the agent:
+
+    ```
+    bash run_agent.sh
     ```
