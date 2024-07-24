@@ -70,13 +70,15 @@ A service to learn about [Olas](https://olas.network/) agents and [Open Autonomy
     docker
     ```
 
-2. Run the service:
+2. Verify that `ALL_PARTICIPANTS` in `.env` contains 4 addresses.
+
+3. Run the service:
 
     ```
     bash run_service.sh
     ```
 
-3. Look at the service logs (on another terminal):
+4. Look at the service logs (on another terminal):
 
     ```
     docker logs -f learningservice_abci_0
@@ -85,7 +87,9 @@ A service to learn about [Olas](https://olas.network/) agents and [Open Autonomy
 
 ### Run a single agent
 
-1. Run the agent:
+1. Verify that `ALL_PARTICIPANTS` in `.env` contains only 1 address.
+
+2. Run the agent:
 
     ```
     bash run_agent.sh
