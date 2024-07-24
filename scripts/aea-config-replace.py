@@ -35,11 +35,6 @@ def main() -> None:
         config = list(yaml.safe_load_all(file))
 
         # Ledger RPCs
-        if os.getenv("ETHEREUM_LEDGER_RPC"):
-            config[2]["config"]["ledger_apis"]["ethereum"][
-                "address"
-            ] = f"${{str:{os.getenv('ETHEREUM_LEDGER_RPC')}}}"
-
         if os.getenv("GNOSIS_LEDGER_RPC"):
             config[2]["config"]["ledger_apis"]["gnosis"][
                 "address"
@@ -50,6 +45,16 @@ def main() -> None:
             config[-1]["models"]["params"]["args"][
                 "coingecko_api_key"
             ] = f"${{str:{os.getenv('COINGECKO_API_KEY')}}}"  # type: ignore
+
+        if os.getenv("ALL_PARTICIPANTS"):
+            config[-1]["models"]["params"]["args"]["setup"][
+                "all_participants"
+            ] = f"${{list:{os.getenv('ALL_PARTICIPANTS')}}}"  # type: ignore
+
+        if os.getenv("SAFE_CONTRACT_ADDRESS"):
+            config[-1]["models"]["params"]["args"]["setup"][
+                "safe_contract_address"
+            ] = f"${{str:{os.getenv('SAFE_CONTRACT_ADDRESS')}}}"  # type: ignore
 
     with open(Path("learning_agent", "aea-config.yaml"), "w", encoding="utf-8") as file:
         yaml.dump_all(config, file, sort_keys=False)
