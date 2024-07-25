@@ -47,7 +47,7 @@ class Params(BaseParams):
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Initialize the parameters object."""
-        self.coingecko_price_template = self._ensure(
+        self.coingecko_price_template: str = self._ensure(
             "coingecko_price_template", kwargs, str
         )
         self.coingecko_api_key = kwargs.get("coingecko_api_key", None)

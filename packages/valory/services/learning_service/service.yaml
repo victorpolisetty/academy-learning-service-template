@@ -7,7 +7,7 @@ license: Apache-2.0
 fingerprint:
   README.md: bafybeid42pdrf6qrohedylj4ijrss236ai6geqgf3he44huowiuf7pl464
 fingerprint_ignore_patterns: []
-agent: valory/learning_agent:0.1.0:bafybeiavib2kjqwahd4lkpgjhld3jfi2njecdvef5nnbt3bheqjv6gyxie
+agent: valory/learning_agent:0.1.0:bafybeic3wkrjsejqa2kdnfmiilfl2s3zacne2iil7qcad3jfcefsuf2zaa
 number_of_agents: 4
 deployment:
   agent:
@@ -51,7 +51,7 @@ extra:
   models:
     benchmark_tool:
       args:
-        log_dir: ${LOG_DIR:str:/logs}
+        log_dir: ${LOG_DIR:str:/tmp}
     params:
       args:
         setup: *id001
@@ -90,14 +90,13 @@ extra:
         ipfs_address: ${IPFS_ADDRESS:str:https://gateway.autonolas.tech/ipfs/}
         default_chain_id: ${DEFAULT_CHAIN_ID:str:gnosis}
         termination_from_block: ${TERMINATION_FROM_BLOCK:int:34088325}
-        coingecko_price_template: ${COINGECKO_PRICE_TEMPLATE:str:https://api.coingecko.com/api/v3/simple/price?ids=autonolas&vs_currencies=usd&x_cg_demo_api_key={api_key}}
         coingecko_api_key: ${COINGECKO_API_KEY:str:null}
         transfer_target_address: ${TRANSFER_TARGET_ADDRESS:str:0x615d3278680337e2D39C3bc5042D959C7938B917}
 1:
   models:
     benchmark_tool:
       args:
-        log_dir: ${LOG_DIR:str:/logs}
+        log_dir: ${LOG_DIR:str:/tmp}
     params:
       args:
         setup: *id001
@@ -136,14 +135,13 @@ extra:
         ipfs_address: ${IPFS_ADDRESS:str:https://gateway.autonolas.tech/ipfs/}
         default_chain_id: ${DEFAULT_CHAIN_ID:str:gnosis}
         termination_from_block: ${TERMINATION_FROM_BLOCK:int:34088325}
-        coingecko_price_template: ${COINGECKO_PRICE_TEMPLATE:str:https://api.coingecko.com/api/v3/simple/price?ids=autonolas&vs_currencies=usd&x_cg_demo_api_key={api_key}}
         coingecko_api_key: ${COINGECKO_API_KEY:str:null}
         transfer_target_address: ${TRANSFER_TARGET_ADDRESS:str:0x615d3278680337e2D39C3bc5042D959C7938B917}
 2:
   models:
     benchmark_tool:
       args:
-        log_dir: ${LOG_DIR:str:/logs}
+        log_dir: ${LOG_DIR:str:/tmp}
     params:
       args:
         setup: *id001
@@ -189,7 +187,7 @@ extra:
   models:
     benchmark_tool:
       args:
-        log_dir: ${LOG_DIR:str:/logs}
+        log_dir: ${LOG_DIR:str:/tmp}
     params:
       args:
         setup: *id001
