@@ -7,14 +7,14 @@ license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   __init__.py: bafybeiho3lkochqpmes4f235chq26oggmwnol3vjuvhosleoubbjirbwaq
-  behaviours.py: bafybeiatc26zpyvc3bqtdtvy5tzzzxwymrc36gklskcmbw5f4n5utom3v4
+  behaviours.py: bafybeic5yg4mue2w2luyq4cslpc4kvoaethaz4odvvksufk4jqntgv3gje
   dialogues.py: bafybeifqjbumctlffx2xvpga2kcenezhe47qhksvgmaylyp5ypwqgfar5u
-  fsm_specification.yaml: bafybeicxvornc7gpvpotob6z46fl7qmataxydn22fr22qnb4ausfg6vppe
-  graph_tooling/queries/large_data_query.py: bafybeigzgx4xg4r3aerj4nd3yuwzcu3hncdck2jjzpdpvephbddzuxgt2q
+  fsm_specification.yaml: bafybeiczx2idu53hhjecrszmsjwz7owouzxmc67sbsrxh3z6ggod7ckfjm
+  graph_tooling/queries/large_data_query.py: bafybeifeghipbbec3ck5abepaiyw4toe2scpoukjdnfls2h5xrc4uclaji
   handlers.py: bafybeigjadr4thz6hfpfx5abezbwnqhbxmachf4efasrn4z2vqhsqgnyvi
-  models.py: bafybeihyqzj45w6ulkzndqi53m6sorz4q4q2mzrllbtulvd7gyy5w6yn4m
-  payloads.py: bafybeidgjtjk2hxrhrlyzpavgbtz3wnjxoqfdw4lqkoty5whd4zzb473he
-  rounds.py: bafybeictdk3lz32inaynu2lkragkr525mgaw4t66lrvl3mmlpzerq77t6i
+  models.py: bafybeih5s355v2p5mh2eohbndurme7ddfyax3sbpinl2qnsada2x64phj4
+  payloads.py: bafybeiemoljjjegy6helk3syfxciak5wxzyqwrfyspu2ie77qrgi6ivaja
+  rounds.py: bafybeidy4zmol5xtc2apernxgmof5uapstdhpmzdl7mph3n3vahdez2sgu
 fingerprint_ignore_patterns: []
 connections: []
 contracts:
@@ -126,6 +126,8 @@ models:
       service_endpoint_base: https://learning.staging.autonolas.tech/
       coingecko_price_template: https://api.coingecko.com/api/v3/simple/price?ids=autonolas&vs_currencies=usd&x_cg_demo_api_key={api_key}
       coingecko_api_key: CG-jrHiRPynsMtt2ta5a9sDA5HF
+      subgraph_endpoint: https://gateway-arbitrum.network.thegraph.com/api/{api_key}/subgraphs/id/5zvR82QoaXYFyDEKLZ9t6v9adgnptxYpKpSbxtgVENFV
+      subgraph_api_key: d7a8da4340a1510cbcffc1e89ef06351
       transfer_target_address: '0x0000000000000000000000000000000000000000'
     class_name: Params
   requests:

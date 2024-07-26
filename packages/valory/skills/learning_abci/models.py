@@ -47,11 +47,17 @@ class Params(BaseParams):
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Initialize the parameters object."""
-        self.coingecko_price_template: str = self._ensure(
-            "coingecko_price_template", kwargs, str
-        )
+
+        self.transfer_target_address = self._ensure("transfer_target_address", kwargs, str)
+
+        #coingecko values
+        self.coingecko_price_template: str = self._ensure("coingecko_price_template", kwargs, str)
         self.coingecko_api_key = kwargs.get("coingecko_api_key", None)
-        self.transfer_target_address = self._ensure(
-            "transfer_target_address", kwargs, str
-        )
+
+        #subgraph values
+        self.subgraph_endpoint: str = self._ensure("subgraph_endpoint", kwargs, type_=str)
+        self.subgraph_api_key = kwargs.get("subgraph_api_key", None)
+        # self.fear_and_greed_endpoint: str = (
+        #     f"{subgraph_base_endpoint}&api={self.fear_and_greed_num_points}"
+        # )
         super().__init__(*args, **kwargs)

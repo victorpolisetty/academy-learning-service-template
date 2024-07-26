@@ -36,6 +36,7 @@ from packages.valory.skills.abstract_round_abci.base import (
 )
 from packages.valory.skills.learning_abci.payloads import (
     APICheckPayload,
+    LargeDataCheckPayload,
     DecisionMakingPayload,
     TxPreparationPayload,
 )
@@ -69,9 +70,19 @@ class SynchronizedData(BaseSynchronizedData):
         return self.db.get("price", None)
 
     @property
+    def ipfs_hash(self) -> Optional[float]:
+        """Get the token price."""
+        return self.db.get("ipfs_hash", None)
+
+    @property
     def participant_to_price_round(self) -> DeserializedCollection:
         """Get the participants to the price round."""
         return self._get_deserialized("participant_to_price_round")
+
+    @property
+    def participant_to_ipfs_hash_round(self) -> DeserializedCollection:
+        """Get the participants to the price round."""
+        return self._get_deserialized("participant_to_ipfs_hash_round")
 
     @property
     def most_voted_tx_hash(self) -> Optional[float]:
@@ -98,6 +109,18 @@ class APICheckRound(CollectSameUntilThresholdRound):
     no_majority_event = Event.NO_MAJORITY
     collection_key = get_name(SynchronizedData.participant_to_price_round)
     selection_key = get_name(SynchronizedData.price)
+
+    # Event.ROUND_TIMEOUT  # this needs to be referenced for static checkers
+
+class LargeDataCheckRound(CollectSameUntilThresholdRound):
+    """LargeDataCheckRound"""
+
+    payload_class = LargeDataCheckPayload
+    synchronized_data_class = SynchronizedData
+    done_event = Event.DONE
+    no_majority_event = Event.NO_MAJORITY
+    collection_key = get_name(SynchronizedData.participant_to_ipfs_hash_round)
+    selection_key = get_name(SynchronizedData.ipfs_hash)
 
     # Event.ROUND_TIMEOUT  # this needs to be referenced for static checkers
 
@@ -160,6 +183,11 @@ class LearningAbciApp(AbciApp[Event]):
         APICheckRound: {
             Event.NO_MAJORITY: APICheckRound,
             Event.ROUND_TIMEOUT: APICheckRound,
+            Event.DONE: LargeDataCheckRound,
+        },
+        LargeDataCheckRound: {
+            Event.NO_MAJORITY: LargeDataCheckRound,
+            Event.ROUND_TIMEOUT: LargeDataCheckRound,
             Event.DONE: DecisionMakingRound,
         },
         DecisionMakingRound: {
@@ -185,6 +213,7 @@ class LearningAbciApp(AbciApp[Event]):
     cross_period_persisted_keys: FrozenSet[str] = frozenset()
     db_pre_conditions: Dict[AppState, Set[str]] = {
         APICheckRound: set(),
+        DecisionMakingRound: set(),
     }
     db_post_conditions: Dict[AppState, Set[str]] = {
         FinishedDecisionMakingRound: set(),

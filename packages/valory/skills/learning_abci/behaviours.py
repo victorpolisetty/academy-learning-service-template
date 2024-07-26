@@ -18,11 +18,17 @@
 # ------------------------------------------------------------------------------
 
 """This package contains round behaviours of LearningAbciApp."""
+from packages.valory.skills.abstract_round_abci.io_.store import SupportedFiletype
 import json
+import tempfile
+import tenacity
+from enum import Enum, auto
 from abc import ABC
-from typing import Generator, Set, Type, cast, Optional
-
+from typing import Generator, Set, Type, cast, Optional, Dict, Any
+from subgrounds import Subgrounds, FieldPath
 from packages.valory.contracts.gnosis_safe.contract import GnosisSafeContract
+from packages.valory.skills.abstract_round_abci.models import ApiSpecs
+
 from packages.valory.protocols.contract_api import ContractApiMessage
 from packages.valory.skills.abstract_round_abci.base import AbstractRound
 from packages.valory.skills.transaction_settlement_abci.rounds import TX_HASH_LENGTH
@@ -30,14 +36,20 @@ from packages.valory.skills.abstract_round_abci.behaviours import (
     AbstractRoundBehaviour,
     BaseBehaviour,
 )
+from packages.valory.skills.learning_abci.graph_tooling.queries.large_data_query import (
+    large_data as large_data_query,
+)
+from packages.valory.skills.abstract_round_abci.io_.ipfs import IPFSInteract
 from packages.valory.skills.learning_abci.models import Params, SharedState
 from packages.valory.skills.learning_abci.payloads import (
     APICheckPayload,
+    LargeDataCheckPayload,
     DecisionMakingPayload,
     TxPreparationPayload,
 )
 from packages.valory.skills.learning_abci.rounds import (
     APICheckRound,
+    LargeDataCheckRound,
     DecisionMakingRound,
     Event,
     LearningAbciApp,
@@ -57,10 +69,27 @@ VALUE_KEY = "value"
 TO_ADDRESS_KEY = "to_address"
 ETHER_VALUE = 1
 call_data = {VALUE_KEY: ETHER_VALUE, TO_ADDRESS_KEY: "0xbDcc35821DAA3a15047615773E14c77a1042d317"}
+MAX_LOG_SIZE = 1000
+
+
+def to_content(query: str) -> bytes:
+    """Convert the given query string to payload content, i.e., add it under a `queries` key and convert it to bytes."""
+    finalized_query = {"query": query}
+    encoded_query = json.dumps(finalized_query, sort_keys=True).encode("utf-8")
+
+    return encoded_query
+
+
+class FetchStatus(Enum):
+    """The status of a fetch operation."""
+
+    SUCCESS = auto()
+    IN_PROGRESS = auto()
+    FAIL = auto()
+    NONE = auto()
 
 
 class LearningBaseBehaviour(BaseBehaviour, ABC):  # pylint: disable=too-many-ancestors
-    """Base behaviour for the learning_abci skill."""
 
     @property
     def synchronized_data(self) -> SynchronizedData:
@@ -77,6 +106,15 @@ class LearningBaseBehaviour(BaseBehaviour, ABC):  # pylint: disable=too-many-anc
         """Return the state."""
         return cast(SharedState, self.context.state)
 
+    @property
+    def current_subgraph(self) -> ApiSpecs:
+        self.sg = Subgrounds()
+        url = self.params.subgraph_endpoint.format(api_key=self.params.subgraph_api_key)
+        current_subgraph = self.sg.load_subgraph(
+            url=url
+        )
+        """Get a subgraph by prediction market's name."""
+        return current_subgraph
 
 class APICheckBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ancestors
     """APICheckBehaviour"""
@@ -122,7 +160,77 @@ class APICheckBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ance
         self.context.logger.info(f"Price is {price}")
         return price
 
+class LargeDataCheckBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ancestors
+    """LargeDataCheckBehaviour"""
 
+    matching_round: Type[AbstractRound] = LargeDataCheckRound
+
+    def async_act(self) -> Generator:
+        """Do the act, supporting asynchronous execution."""
+
+        with self.context.benchmark_tool.measure(self.behaviour_id).local():
+            sender = self.context.agent_address
+            data = yield from self.get_large_data()
+            if data is None:
+                return
+            try:
+                ipfs_hash = self.upload_to_ipfs(data)
+                print("The IPFS Hash: ")
+                #THIS IS DICT SHOULD BE STRING????
+                print(ipfs_hash)
+                payload = LargeDataCheckPayload(sender=sender, ipfs_hash=ipfs_hash)
+            except Exception as e:
+                self.context.logger.error(f"Error while uploading to IPFS: {e}")
+                return
+
+        with self.context.benchmark_tool.measure(self.behaviour_id).consensus():
+            yield from self.send_a2a_transaction(payload)
+            yield from self.wait_until_round_end()
+
+        self.set_done()
+
+
+    def upload_to_ipfs(self, data: Dict[str, Any]) -> str:
+        """Upload data to IPFS and return the hash."""
+        try:
+            # Convert data to JSON string
+            json_data = json.dumps(data)
+
+            # Save JSON string to a temporary file
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as temp_file:
+                temp_file.write(json_data.encode('utf-8'))
+                temp_file_path = temp_file.name
+
+            # Upload the temporary file to IPFS
+            # TODO: get correct IPFS hash
+            ipfs_interact = IPFSInteract()
+            ipfs_hash = ipfs_interact.store(filepath=temp_file_path, obj=data, multiple=False, filetype=SupportedFiletype.JSON)
+
+            return ipfs_hash
+        except Exception as e:
+            self.context.logger.error(f"IPFS interaction failed: {e}")
+            raise
+
+    # TODO: get data from subgraph
+    def get_large_data(self) -> Generator[None, None, Optional[Dict[str, Any]]]:
+        self._fetch_status = FetchStatus.IN_PROGRESS
+
+        query = large_data_query.substitute()
+        res_raw = yield from self.get_http_response(
+            content=to_content(query),
+            method='POST',
+            url=self.params.subgraph_endpoint.format(api_key=self.params.subgraph_api_key)
+        )
+        # Directly process the response without calling process_response
+        res = json.loads(res_raw.body) if res_raw else None
+        if res is None:
+            self.context.logger.error("Failed to fetch data from subgraph.")
+            return None
+        return res
+
+
+
+# TODO: read behavior from ipfs hash and make decision based on it
 class DecisionMakingBehaviour(
     LearningBaseBehaviour
 ):  # pylint: disable=too-many-ancestors
@@ -154,7 +262,7 @@ class DecisionMakingBehaviour(
         self.context.logger.info(f"Event is {event}")
         return event
 
-
+# TODO: get safe tx hash from contract
 class TxPreparationBehaviour(
     LearningBaseBehaviour
 ):  # pylint: disable=too-many-ancestors
@@ -236,6 +344,7 @@ class LearningRoundBehaviour(AbstractRoundBehaviour):
     abci_app_cls = LearningAbciApp  # type: ignore
     behaviours: Set[Type[BaseBehaviour]] = [  # type: ignore
         APICheckBehaviour,
+        LargeDataCheckBehaviour,
         DecisionMakingBehaviour,
         TxPreparationBehaviour,
     ]

@@ -17,41 +17,27 @@
 #
 # ------------------------------------------------------------------------------
 
-"""Network queries."""
+"""Large Data"""
 
 from string import Template
 
 
-large_data_query = Template(
+large_data = Template(
     """
 {
-  pairs(first: $first) {
+  protocols(first: 5) {
     id
-    token0 {
+    pairs {
       id
-      symbol
-      name
     }
-    token1 {
-      id
-      symbol
-      name
-    }
-    reserve0
-    reserve1
-    totalSupply
-    reserveETH
-    reserveUSD
-    trackedReserveETH
-    trackedReserveUSD
-    token0Price
-    token1Price
-    volumeToken0
-    volumeToken1
-    volumeUSD
-    txCount
-    createdAtTimestamp
-    createdAtBlockNumber
+    defaultTradingFeePPM
+    pairCount
+  }
+  tokens(first: 5) {
+    id
+    name
+    symbol
+    decimals
   }
 }
 """

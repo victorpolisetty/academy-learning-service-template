@@ -31,6 +31,12 @@ class APICheckPayload(BaseTxPayload):
 
     price: Optional[float]
 
+@dataclass(frozen=True)
+class LargeDataCheckPayload(BaseTxPayload):
+    """Represent a transaction payload for the APICheckRound."""
+
+    ipfs_hash: str
+
 
 @dataclass(frozen=True)
 class DecisionMakingPayload(BaseTxPayload):
